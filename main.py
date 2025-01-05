@@ -1,7 +1,9 @@
 from pygame import *
+from random import randint
+
 
 init()
-W, H = 700, 650
+W, H = 600, 700
 
 window = display.set_mode((W, H))
 display.set_caption('Space Shooter')
@@ -12,6 +14,7 @@ clock = time.Clock()
 
 class GameSprite(sprite.Sprite):
     def __init__(self, x, y, width, height, speed, img):
+        super().__init__()
         self.width = width
         self.height = height
         self.speed = speed
@@ -31,10 +34,27 @@ class Player(GameSprite):
         if keys_pressed[K_d] and self.rect.x < W - self.width:
             self.rect.x += self.speed
 
-player = Player(W/2, H - 100, 70, 100, 10, 'images/rocket.png')
+player = Player(W/2, H - 100, 80, 100, 15, 'images/rocket.png')
 
 
+life = 3
+killed = 0 
+skipped = 0
 
+
+class Enemy(GameSprite):
+    def update(self):
+        global killed 
+        self.rect.y += self.speed
+        if self.rect.y > H - self.height:
+            self.rect.x = randint(0, H - self.width)
+            self.rect.y = 0
+            killed += 1
+
+enemies = sprite.Group()
+for i in range(5):
+    enemy = Enemy(randint(0, H), 0, 70, 35, 2, 'images/ufo.png' )
+    enemies.add(enemy)
 
 
 
@@ -47,10 +67,10 @@ while game:
     window.blit(bg, (0, 0))
     player.draw()
     player.move()
+    enemies.draw(window)
+    enemies.update()
     display.update()
     clock.tick(60)
-    
-
 
 
 
